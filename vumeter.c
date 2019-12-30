@@ -14,26 +14,36 @@ static const int WIDTH = 800, HEIGHT = WIDTH / 4;
 static const float SIX_DBA = powf(10, 0.3);
 
 /* Calibrated meter labels, measured using
-	play </dev/zero -q -t s32 -r 22050 -c 2 - synth sine 1000 vol <number> dB
+	$ play </dev/zero -q -t s32 -r 48000 -c 2 - synth sine 1000 \
+	  vol <number> dB
 */
-static const char *METER_SCALE[8] = {"-∞", "-42", "-36", "-27", "-19", "-11", "-4", "0"};
+static const char *METER_SCALE[8] =
+			{"-∞", "-42", "-36", "-27", "-19", "-11", "-4", "0"};
+
+static const char *SCALE_FONT = "/usr/share/fonts/dejavu/DejaVuSans.ttf";
+static const char *LOGO_FONT =
+			"/usr/share/fonts/dejavu/DejaVuSans-BoldOblique.ttf";
 
 struct sprung_mass {
-	float m; /* Mass. */
-	float k; /* Spring constant. */
-	float d; /* Damping coefficient. */
-	float x; /* Displacement. */
-	float v; /* Velocity. */
+	float m; /* mass */
+	float k; /* spring constant */
+	float d; /* damping coefficient */
+	float x; /* displacement */
+	float v; /* velocity */
 };
 
 static int time;
 static float left_force, right_force;
 
 /* The natural frequency of this system should be 2.1 Hz +/- 10%. */
-static struct sprung_mass left_mass = {0.005, 1.0, 0.08, 1}, right_mass = {0.005, 1.0, 0.08, 1};
+static struct sprung_mass
+	left_mass = {0.005, 1.0, 0.08, 1},
+	right_mass = {0.005, 1.0, 0.08, 1};
 
-/* Apply the specified force to the sprung mass for the specified number of milliseconds. */
-static float model(struct sprung_mass *sm, float force, float x_min, float x_max, int millis) {
+/* Apply the specified force to the sprung mass for the specified number
+   of milliseconds. */
+static float model(struct sprung_mass *sm, float force, float x_min,
+						float x_max, int millis) {
 	int t, a;
 	for (t = 0; t < millis; t++) {
 		if (sm->x < x_min) {
@@ -101,7 +111,8 @@ static void audio_callback(void *userdata, Uint8 *stream, int len) {
 	right_force = get_force(get_max_amplitude((Sint16*)stream, len/2, 1));
 }
 
-static void draw_gradient(SDL_Renderer *renderer, Uint32 colour1, Uint32 colour2, int width, int height) {
+static void draw_gradient(SDL_Renderer *renderer, Uint32 colour1,
+				Uint32 colour2, int width, int height) {
 	int r1 = (colour1 >> 16) & 0xFF;
 	int r2 = (colour2 >> 16) & 0xFF;
 	int g1 = (colour1 >> 8) & 0xFF;
@@ -124,10 +135,12 @@ static void draw_gradient(SDL_Renderer *renderer, Uint32 colour1, Uint32 colour2
 }
 
 static void set_colour(SDL_Renderer *renderer, Uint32 colour) {
-	SDL_SetRenderDrawColor(renderer, (colour>>16)&0xFF, (colour>>8)&0xFF, colour&0xFF, 255);
+	SDL_SetRenderDrawColor(renderer, (colour>>16)&0xFF,
+					(colour>>8)&0xFF, colour&0xFF, 255);
 }
 
-static void draw_rect(SDL_Renderer *renderer, int x, int y, int width, int height) {
+static void draw_rect(SDL_Renderer *renderer, int x, int y, int width,
+								int height) {
 	SDL_Rect rect;
 	rect.x = x;
 	rect.y = y;
@@ -136,7 +149,8 @@ static void draw_rect(SDL_Renderer *renderer, int x, int y, int width, int heigh
 	SDL_RenderDrawRect(renderer, &rect);
 }
 
-static void fill_rect(SDL_Renderer *renderer, int x, int y, int width, int height) {
+static void fill_rect(SDL_Renderer *renderer, int x, int y, int width,
+								int height) {
 	SDL_Rect rect;
 	rect.x = x;
 	rect.y = y;
@@ -145,7 +159,8 @@ static void fill_rect(SDL_Renderer *renderer, int x, int y, int width, int heigh
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-static void draw_ruler(SDL_Renderer *renderer, int x, int width, Uint32 scale_colour, Uint32 peak_colour) {
+static void draw_ruler(SDL_Renderer *renderer, int x, int width,
+				Uint32 scale_colour, Uint32 peak_colour) {
 	int n;
 	int y = width / 8;
 	int w = width * 14 / 16;
@@ -164,7 +179,8 @@ static void draw_ruler(SDL_Renderer *renderer, int x, int width, Uint32 scale_co
 		if (segment_width >= 12) {
 			int v;
 			for (v = 1; v < 6; v++) {
-				fill_rect(renderer, n+segment_width*v/6, y, 1, h/2);
+				fill_rect(renderer, n+segment_width*v/6,
+								y, 1, h/2);
 			}
 		}
 	}
@@ -182,15 +198,17 @@ static void sdl_check(int ok, const char *msg) {
 }
 
 static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
-	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/dejavu/DejaVuSans.ttf", 17);
+	TTF_Font *font = TTF_OpenFont(SCALE_FONT, 17);
 	sdl_check(font != NULL, "open scale font");
 	SDL_Color white = {255, 255, 255};
 	x = x + width / 16;
 	int y = width / 5;
 	int i;
 	for (i = 0; i < 8; ++i) {
-		SDL_Surface *surface = TTF_RenderUTF8_Solid(font, METER_SCALE[i], white);
-		SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+		SDL_Surface *surface =
+			TTF_RenderUTF8_Solid(font, METER_SCALE[i], white);
+		SDL_Texture *texture =
+			SDL_CreateTextureFromSurface(renderer, surface);
 		int w, h;
 		SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 		SDL_Rect dstrect = {x-w/2, y, w, h};
@@ -203,7 +221,7 @@ static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
 }
 
 static void draw_logo(SDL_Renderer *renderer, int x, int width) {
-	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/dejavu/DejaVuSans-BoldOblique.ttf", 17);
+	TTF_Font *font = TTF_OpenFont(LOGO_FONT, 21);
 	sdl_check(font != NULL, "open logo font");
 	SDL_Color black = {0, 0, 0};
 	SDL_Surface *surface = TTF_RenderUTF8_Solid(font, "Nice VU", black);
@@ -219,7 +237,8 @@ static void draw_logo(SDL_Renderer *renderer, int x, int width) {
 	TTF_CloseFont(font);
 }
 
-static void draw_needle(SDL_Renderer *renderer, int x, int width, Uint32 colour, float deflection) {
+static void draw_needle(SDL_Renderer *renderer, int x, int width,
+					Uint32 colour, float deflection) {
 	float angle = deflection * M_PI / 2 - M_PI / 4;
 	int x1 = width / 2 + width * 8 / 16 * sinf(angle);
 	int y1 = width * 9 / 16 - width * 8 / 16 * cosf(angle);
@@ -229,7 +248,8 @@ static void draw_needle(SDL_Renderer *renderer, int x, int width, Uint32 colour,
 	SDL_RenderDrawLine(renderer, x+x1, y1, x+x2, y2);
 }
 
-static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour, Uint32 peak_colour, int x, int width, int height) {
+static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour,
+			Uint32 peak_colour, int x, int width, int height) {
 	set_colour(renderer, scale_colour);
 	draw_rect(renderer, x+width*5/16, width*3/8, width*6/16, width/16);
 	draw_ruler(renderer, x, width, scale_colour, peak_colour);
@@ -248,13 +268,18 @@ static void setup() {
 	/* Initialize SDL. */
 	if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER) == 0) {
 		TTF_Init();
-		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, 0);
+		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED,
+				SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, 0);
 		sdl_check(window != NULL, "create window");
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE);
+		renderer = SDL_CreateRenderer(window, -1,
+						SDL_RENDERER_TARGETTEXTURE);
 		sdl_check(renderer != NULL, "create renderer");
-		target = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
+		target = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+				SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
 		sdl_check(target != NULL, "create texture (target)");
-		background = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
+		background = SDL_CreateTexture(renderer,
+				SDL_PIXELFORMAT_RGBA8888,
+				SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
 		sdl_check(background != NULL, "create texture (background)");
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
@@ -270,14 +295,16 @@ static void setup() {
 		audiospec.channels = 2;
 		audiospec.samples = 1024;
 		audiospec.callback = audio_callback;
-		audiodev = SDL_OpenAudioDevice(NULL, 1, &audiospec, &audiospec, 0);
+		audiodev = SDL_OpenAudioDevice(NULL, 1, &audiospec,
+							&audiospec, 0);
 		sdl_check(audiodev >= 0, "open audio device");
 		SDL_PauseAudioDevice(audiodev, 0);
 		time = SDL_GetTicks();
 		timer = SDL_AddTimer(12, timer_callback, NULL);
 		sdl_check(timer, "start timer");
 	} else {
-		fprintf(stderr, "Unable to initialise SDL: %s\n", SDL_GetError());
+		fprintf(stderr, "Unable to initialise SDL: %s\n",
+							SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 }
@@ -302,7 +329,8 @@ int main(int argc, char **argv) {
 			SDL_SetRenderTarget(renderer, target);
 			SDL_RenderCopy(renderer, background, NULL, NULL);
 			draw_needle(renderer, 0, WIDTH/2, 0, left_mass.x);
-			draw_needle(renderer, WIDTH/2, WIDTH/2, 0, right_mass.x);
+			draw_needle(renderer, WIDTH/2, WIDTH/2, 0,
+								right_mass.x);
 			SDL_SetRenderTarget(renderer, NULL);
 			SDL_RenderCopy(renderer, target, NULL, NULL);
 			SDL_RenderPresent(renderer);
