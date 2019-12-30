@@ -34,3 +34,4 @@ https://github.com/martincameron/vumeter.git
 		- -e: extended range (log rather than log10)
 		- -p: peak meter
 		- -c <count>: number of channels (later?)
+	- find font path
