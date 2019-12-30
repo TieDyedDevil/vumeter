@@ -1,12 +1,17 @@
 
-CC=gcc
-CFLAGS=-Wall -g
-ANSI_C=-ansi -pedantic
+CC ?= gcc
+CFLAGS = -Wall -g
 
-all: vumeter-sdl
+all: vumeter
 
 clean:
-	rm -f vumeter-sdl
+	rm -f vumeter
 
-vumeter-sdl: vumeter.c
-	$(CC) $(CFLAGS) vumeter.c -o vumeter-sdl -lm `sdl2-config --cflags --libs`
+vumeter: vumeter.c
+	$(CC) $(CFLAGS) vumeter.c -o vumeter -lm `sdl2-config --cflags --libs`
+
+install: vumeter
+	install vumeter /usr/local/bin/
+
+uninstall:
+	rm -f /usr/local/bin/vumeter
