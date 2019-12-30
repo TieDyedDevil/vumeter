@@ -18,10 +18,8 @@ https://github.com/martincameron/vumeter.git
 				synth sine 1000 vol <number> dB
 		- using log10, scale would be as follows
 			- -Inf -17 -11 -7 -5 -3 -1 0 (unadjusted for geom)
-		- see https://stackoverflow.com/questions/22886500/ \
-						^how-to-render-text-in-sdl2
-		- see http://gigi.nullneuron.net/gigilabs/ \
-					^displaying-text-in-sdl2-with-sdl_ttf/
+		- see https://stackoverflow.com/questions/22886500/how-to-render-text-in-sdl2
+		- see http://gigi.nullneuron.net/gigilabs/displaying-text-in-sdl2-with-sdl_ttf/
 			- require SDL2_ttf-devel
 			- doc at https://www.libsdl.org/projects/SDL_ttf/docs/
 	- add sample-peak indicators {-5, -2, -1, -0.5, -0.2, -0.1, 0.0}

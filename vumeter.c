@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 static const char *TITLE = "vumeter";
 
@@ -172,6 +173,35 @@ static void draw_ruler(SDL_Renderer *renderer, int x, int width, Uint32 scale_co
 	fill_rect(renderer, x+segment_width*6, y, segment_width, h);
 }
 
+static void sdl_check(int ok, const char *msg) {
+	if (!ok) {
+		fprintf(stderr, "Unable to %s: %s\n", msg, SDL_GetError());
+		SDL_Quit();
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
+	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/dejavu/DejaVuSans.ttf", 17);
+	sdl_check(font != NULL, "open font");
+	SDL_Color white = {255, 255, 255};
+	x = x + width / 16;
+	int y = width / 5;
+	int i;
+	for (i = 0; i < 8; ++i) {
+		SDL_Surface *surface = TTF_RenderUTF8_Solid(font, METER_SCALE[i], white);
+		SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+		int w, h;
+		SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+		SDL_Rect dstrect = {x-w/2, y, w, h};
+		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+		SDL_DestroyTexture(texture);
+		SDL_FreeSurface(surface);
+		x = x + width / 8;
+	}
+	TTF_CloseFont(font);
+}
+
 static void draw_needle(SDL_Renderer *renderer, int x, int width, Uint32 colour, float deflection) {
 	float angle = deflection * M_PI / 2 - M_PI / 4;
 	int x1 = width / 2 + width * 8 / 16 * sinf(angle);
@@ -186,14 +216,7 @@ static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour, Uint32 peak_
 	set_colour(renderer, scale_colour);
 	draw_rect(renderer, x+width*5/16, width*3/8, width*6/16, width/16);
 	draw_ruler(renderer, x, width, scale_colour, peak_colour);
-}
-
-static void sdl_check(int ok, const char *msg) {
-	if (!ok) {
-		fprintf(stderr, "Unable to %s: %s\n", msg, SDL_GetError());
-		SDL_Quit();
-		exit(EXIT_FAILURE);
-	}
+	draw_scale_label(renderer, x, width);
 }
 
 static struct SDL_Renderer *renderer;
@@ -206,6 +229,7 @@ static void setup() {
 	SDL_TimerID timer;
 	/* Initialize SDL. */
 	if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER) == 0) {
+		TTF_Init();
 		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, 0);
 		sdl_check(window != NULL, "create window");
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE);
@@ -254,7 +278,7 @@ int main(int argc, char **argv) {
 	while(1) {
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT) {
-			exit(EXIT_SUCCESS);
+			break;
 		} else if (event.type == SDL_WINDOWEVENT) {
 			/* Redraw. */
 			SDL_SetRenderTarget(renderer, target);
@@ -266,6 +290,7 @@ int main(int argc, char **argv) {
 			SDL_RenderPresent(renderer);
 		}
 	}
+	TTF_Quit();
 	SDL_Quit();
 	return EXIT_SUCCESS;
 }
