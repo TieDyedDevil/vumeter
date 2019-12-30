@@ -1,12 +1,12 @@
 PulseAudio VU meter
 https://github.com/martincameron/vumeter.git
-	- drop the web implementation
-	- factor initialization out of main()
-	- remove version string from window title
+	X drop the web implementation
+	X factor initialization out of main()
+	X remove version string from window title
 	- add basic CLI flags
 		- -h: help
 		- -v: version
-	- draw a labeled log scale
+	X draw a labeled log scale
 		- adjust for geometry of scale vs arc of needle
 		- note that zero and FS are at outer corners of black and red
 		- unlike analog VU, our FS corresponds to 0dB digital FS
