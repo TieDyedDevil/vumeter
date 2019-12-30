@@ -161,7 +161,8 @@ static void draw_ruler(SDL_Renderer *renderer, int x, int width, Uint32 scale_co
 		fill_rect(renderer, n, y, 1, h);
 		/* Small marks. */
 		if (segment_width >= 12) {
-			for (int v = 1; v < 6; v++) {
+			int v;
+			for (v = 1; v < 6; v++) {
 				fill_rect(renderer, n+segment_width*v/6, y, 1, h/2);
 			}
 		}

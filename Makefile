@@ -1,6 +1,6 @@
 
-CC ?= gcc
-CFLAGS = -Wall -g
+CC = gcc
+CFLAGS = -Wall -g -std=c11 -U__STRICT_ANSI__
 
 all: vumeter
 
