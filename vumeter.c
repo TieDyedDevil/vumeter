@@ -1,3 +1,10 @@
+/*
+	Accurate VU meter for PulseAudio
+
+	See README.md and LICENSE.
+
+	Descended from https://github.com/martincameron/vumeter.git .
+*/
 
 #include <stdio.h>
 #include <unistd.h>
@@ -5,7 +12,7 @@
 #include <SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static const char *TITLE = "VU meter";
+static const char *TITLE = "VUmeter";
 
 static const char *VERSION = "2.0";
 
@@ -309,10 +316,21 @@ static void setup() {
 	}
 }
 
+static void usage() {
+	printf(
+		"options:\n"
+		"  -v  display version and exit\n"
+		"  -h  display help and exit\n"
+	);
+}
+
 int main(int argc, char **argv) {
 	int opt;
-	while ((opt = getopt(argc, argv, "v")) != -1) {
+	while ((opt = getopt(argc, argv, "hv")) != -1) {
 		switch (opt) {
+		case 'h':
+			usage();
+			exit(EXIT_SUCCESS);
 		case 'v':
 			fprintf(stderr, "%s %s\n", TITLE, VERSION);
 			exit(EXIT_SUCCESS);
