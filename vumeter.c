@@ -207,7 +207,7 @@ static void sdl_check(int ok, const char *msg) {
 static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
 	TTF_Font *font = TTF_OpenFont(SCALE_FONT, 17);
 	sdl_check(font != NULL, "open scale font");
-	SDL_Color white = {255, 255, 255};
+	SDL_Color white = {190, 190, 190};
 	x = x + width / 16;
 	int y = width / 5;
 	int i;
@@ -230,7 +230,7 @@ static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
 static void draw_logo(SDL_Renderer *renderer, int x, int width) {
 	TTF_Font *font = TTF_OpenFont(LOGO_FONT, 21);
 	sdl_check(font != NULL, "open logo font");
-	SDL_Color black = {0, 0, 0};
+	SDL_Color black = {70, 70, 70};
 	SDL_Surface *surface = TTF_RenderUTF8_Solid(font, "Nice VU", black);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 	x = x + width / 2;
