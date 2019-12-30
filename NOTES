@@ -1,0 +1,38 @@
+PulseAudio VU meter
+https://github.com/martincameron/vumeter.git
+	- drop the web implementation
+	- factor initialization out of main()
+	- remove version string from window title
+	- add basic CLI flags
+		- -h: help
+		- -v: version
+	- draw a labeled log scale
+		- adjust for geometry of scale vs arc of needle
+		- note that zero and FS are at outer corners of black and red
+		- unlike analog VU, our FS corresponds to 0dB digital FS
+		- as implemented, scale is ln rather than log10
+			- -Inf -39 -25 -16 -11 -7 -3 0 (unadjusted for geom)
+		- as implemented, measured at 1KHz
+			- -Inf -42 -36 -27 -19 -11 -4 0
+			- play </dev/zero -q -t s32 -r 22050 -c 2 - \
+				synth sine 1000 vol <number> dB
+		- using log10, scale would be as follows
+			- -Inf -17 -11 -7 -5 -3 -1 0 (unadjusted for geom)
+		- see https://stackoverflow.com/questions/22886500/ \
+						^how-to-render-text-in-sdl2
+		- see http://gigi.nullneuron.net/gigilabs/ \
+					^displaying-text-in-sdl2-with-sdl_ttf/
+			- require SDL2_ttf-devel
+			- doc at https://www.libsdl.org/projects/SDL_ttf/docs/
+	- add sample-peak indicators {-5, -2, -1, -0.5, -0.2, -0.1, 0.0}
+		- ~250 ms hold
+		- G G Y Y Y R R
+		- consider "true peak" estimation
+	- add VU label in pivot box
+	- add documentation
+		- purpose of VU is subjective loudness
+		- use PulseAudio gain control to set FS headroom
+	- option configuration
+		- -e: extended range (log rather than log10)
+		- -p: peak meter
+		- -c <count>: number of channels (later?)
