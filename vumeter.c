@@ -183,7 +183,7 @@ static void sdl_check(int ok, const char *msg) {
 
 static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
 	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/dejavu/DejaVuSans.ttf", 17);
-	sdl_check(font != NULL, "open font");
+	sdl_check(font != NULL, "open scale font");
 	SDL_Color white = {255, 255, 255};
 	x = x + width / 16;
 	int y = width / 5;
@@ -202,6 +202,23 @@ static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
 	TTF_CloseFont(font);
 }
 
+static void draw_logo(SDL_Renderer *renderer, int x, int width) {
+	TTF_Font *font = TTF_OpenFont("/usr/share/fonts/dejavu/DejaVuSans-BoldOblique.ttf", 17);
+	sdl_check(font != NULL, "open logo font");
+	SDL_Color black = {0, 0, 0};
+	SDL_Surface *surface = TTF_RenderUTF8_Solid(font, "Nice VU", black);
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+	x = x + width / 2;
+	int y = width *3 / 8;
+	int w, h;
+	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+	SDL_Rect dstrect = {x-w/2, y, w, h};
+	SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
+	TTF_CloseFont(font);
+}
+
 static void draw_needle(SDL_Renderer *renderer, int x, int width, Uint32 colour, float deflection) {
 	float angle = deflection * M_PI / 2 - M_PI / 4;
 	int x1 = width / 2 + width * 8 / 16 * sinf(angle);
@@ -217,6 +234,7 @@ static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour, Uint32 peak_
 	draw_rect(renderer, x+width*5/16, width*3/8, width*6/16, width/16);
 	draw_ruler(renderer, x, width, scale_colour, peak_colour);
 	draw_scale_label(renderer, x, width);
+	draw_logo(renderer, x, width);
 }
 
 static struct SDL_Renderer *renderer;
