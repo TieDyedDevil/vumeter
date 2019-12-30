@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-static const char *TITLE = "vumeter";
+static const char *TITLE = "VU meter";
 
 static const char *VERSION = "2.0";
 
