@@ -24,6 +24,8 @@ static const float PEAK_DB = powf(10, -1.5/20);
 static const float SIGNAL_DB = powf(10, -56.0/20);
 static const int PEAK_HOLD = 250; /* ms */
 
+#define CHANNELS 2
+
 /* Calibrated meter labels, measured using
 	$ play </dev/zero -q -t s32 -r 48000 -c 2 - synth sine 1000 \
 	  vol <number> dB
@@ -44,12 +46,12 @@ struct sprung_mass {
 };
 
 static int time;
-static float left_force, right_force;
+static float force[CHANNELS];
 
-/* The natural frequency of this system should be 2.1 Hz +/- 10%. */
-static struct sprung_mass
-	left_mass = {0.005, 1.0, 0.08, 1},
-	right_mass = {0.005, 1.0, 0.08, 1};
+static struct sprung_mass mass[CHANNELS] = {
+	/* The natural frequency of this system should be 2.1 Hz +/- 10%. */
+	[0 ... CHANNELS-1] = {0.005, 1.0, 0.08, 1}
+};
 
 /* Apply the specified force to the sprung mass for the specified number
    of milliseconds. */
@@ -87,8 +89,8 @@ static float get_force(float amplitude) {
 	return force / 8;
 }
 
-static Uint32 peak[2] = {0};
-static int signal[2] = {0};
+static Uint32 peak[CHANNELS] = {0};
+static int signal[CHANNELS] = {0};
 
 static float get_max_amplitude(Sint16 *audio_buf, int len, int channel) {
 	int idx, amp, max_amp = 0;
@@ -111,8 +113,8 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 	SDL_Event event;
 	int now = SDL_GetTicks();
 	/* Update model, assuming callback is regularly called. */
-	model(&left_mass, left_force, 0, 1, now-time);
-	model(&right_mass, right_force, 0, 1, now-time);
+	model(&mass[0], force[0], 0, 1, now-time);
+	model(&mass[1], force[1], 0, 1, now-time);
 	time = now;
 	/* Push redraw event. */
 	event.type = SDL_WINDOWEVENT;
@@ -124,8 +126,8 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 
 static void audio_callback(void *userdata, Uint8 *stream, int len) {
 	/* Calculate force on meter springs. */
-	left_force = get_force(get_max_amplitude((Sint16*)stream, len/2, 0));
-	right_force = get_force(get_max_amplitude((Sint16*)stream, len/2, 1));
+	force[0] = get_force(get_max_amplitude((Sint16*)stream, len/2, 0));
+	force[1] = get_force(get_max_amplitude((Sint16*)stream, len/2, 1));
 }
 
 static void draw_gradient(SDL_Renderer *renderer, Uint32 colour1,
@@ -347,7 +349,7 @@ static void setup() {
 		/* Initialize audio. */
 		audiospec.freq = 48000;
 		audiospec.format = AUDIO_S16SYS;
-		audiospec.channels = 2;
+		audiospec.channels = CHANNELS;
 		audiospec.samples = 1024;
 		audiospec.callback = audio_callback;
 		audiodev = SDL_OpenAudioDevice(NULL, 1, &audiospec,
@@ -394,9 +396,9 @@ int main(int argc, char **argv) {
 			/* Redraw. */
 			SDL_SetRenderTarget(renderer, target);
 			SDL_RenderCopy(renderer, background, NULL, NULL);
-			draw_needle(renderer, 0, WIDTH/2, 0, left_mass.x);
+			draw_needle(renderer, 0, WIDTH/2, 0, mass[0].x);
 			draw_needle(renderer, WIDTH/2, WIDTH/2, 0,
-								right_mass.x);
+								mass[1].x);
 			draw_indicators(renderer, 0, WIDTH/2,
 							signal[0], &peak[0]);
 			draw_indicators(renderer, WIDTH/2, WIDTH/2,
