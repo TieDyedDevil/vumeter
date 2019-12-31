@@ -16,12 +16,13 @@ static const char *TITLE = "VUmeter";
 
 static const char *VERSION = "2.0";
 
-#define CHANNELS 2
+#define CHANNELS 8
+static int channels = 2;
 
 static char *LOGO[CHANNELS] = { [0 ... CHANNELS-1] = "Nice VU" };
 
 static const int METER_WIDTH = 400;
-static const int WIDTH = METER_WIDTH * CHANNELS, HEIGHT = METER_WIDTH / 2;
+static const int HEIGHT = METER_WIDTH / 2;
 
 static const float SIX_DBA = powf(10, 0.3);
 
@@ -117,7 +118,7 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 	int now = SDL_GetTicks();
 	/* Update model, assuming callback is regularly called. */
 	int cn;
-	for (cn = 0; cn < CHANNELS; ++cn) {
+	for (cn = 0; cn < channels; ++cn) {
 		model(&mass[cn], force[cn], 0, 1, now-time);
 	}
 	time = now;
@@ -132,7 +133,7 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 static void audio_callback(void *userdata, Uint8 *stream, int len) {
 	/* Calculate force on meter springs. */
 	int cn;
-	for (cn = 0; cn < CHANNELS; ++cn) {
+	for (cn = 0; cn < channels; ++cn) {
 		force[cn] =
 			get_force(get_max_amplitude((Sint16*)stream,
 				len/(sizeof(Sint16)/sizeof(Uint8)), cn));
@@ -327,7 +328,7 @@ static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour,
 static struct SDL_Renderer *renderer;
 static struct SDL_Texture *target, *background = NULL;
 
-static void setup() {
+static void setup(int width) {
 	struct SDL_Window *window;
 	SDL_AudioSpec audiospec = {0};
 	SDL_AudioDeviceID audiodev;
@@ -336,25 +337,25 @@ static void setup() {
 	if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER) == 0) {
 		TTF_Init();
 		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED,
-				SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, 0);
+				SDL_WINDOWPOS_UNDEFINED, width, HEIGHT, 0);
 		sdl_check(window != NULL, "create window");
 		renderer = SDL_CreateRenderer(window, -1,
 						SDL_RENDERER_TARGETTEXTURE);
 		sdl_check(renderer != NULL, "create renderer");
 		target = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
-				SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
+				SDL_TEXTUREACCESS_TARGET, width, HEIGHT);
 		sdl_check(target != NULL, "create texture (target)");
 		background = SDL_CreateTexture(renderer,
 				SDL_PIXELFORMAT_RGBA8888,
-				SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
+				SDL_TEXTUREACCESS_TARGET, width, HEIGHT);
 		sdl_check(background != NULL, "create texture (background)");
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 		/* Draw background. */
 		SDL_SetRenderTarget(renderer, background);
-		draw_gradient(renderer, 0x806633, 0xFFCC66, WIDTH, HEIGHT);
+		draw_gradient(renderer, 0x806633, 0xFFCC66, width, HEIGHT);
 		int cn;
-		for (cn = 0; cn < CHANNELS; ++cn) {
+		for (cn = 0; cn < channels; ++cn) {
 			draw_meter(renderer, 0, 0xAA0000, cn*METER_WIDTH,
 						METER_WIDTH, HEIGHT, LOGO[cn]);
 		}
@@ -362,7 +363,7 @@ static void setup() {
 		/* Initialize audio. */
 		audiospec.freq = 48000;
 		audiospec.format = AUDIO_S16SYS;
-		audiospec.channels = CHANNELS;
+		audiospec.channels = channels;
 		audiospec.samples = 1024;
 		audiospec.callback = audio_callback;
 		audiodev = SDL_OpenAudioDevice(NULL, 1, &audiospec,
@@ -399,7 +400,7 @@ int main(int argc, char **argv) {
 			exit(EXIT_SUCCESS);
 		}
 	}
-	setup();
+	setup(METER_WIDTH*channels);
 	SDL_Event event;
 	while(1) {
 		SDL_WaitEvent(&event);
@@ -410,7 +411,7 @@ int main(int argc, char **argv) {
 			SDL_SetRenderTarget(renderer, target);
 			SDL_RenderCopy(renderer, background, NULL, NULL);
 			int cn, pos = 0;
-			for (cn = 0; cn < CHANNELS; ++cn) {
+			for (cn = 0; cn < channels; ++cn) {
 				draw_needle(renderer, pos, METER_WIDTH, 0,
 								mass[cn].x);
 				draw_indicators(renderer, pos, METER_WIDTH,
