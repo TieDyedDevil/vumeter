@@ -23,6 +23,9 @@ naturally occur as a result of normalizing the audio to a value approaching
 of that average value. You should not use this indicator to set recording
 levels.
 
+By default, two meters are instantiated. More or fewer meters may be specified
+via a command-line option; the logo text of each meter may be set individually.
+
 This code descends from original work by Martin Cameron. I've added text for
 labels on the scale and a logo, and have reworked the initialization code to
 (IMO) improve readability.

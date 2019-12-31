@@ -382,10 +382,12 @@ static void setup(int width) {
 
 static void usage() {
 	printf(
-		"options:\n"
+		"Options:\n"
 		"  -c #  display # meters (default: 2)\n"
 		"  -v    display version and exit\n"
 		"  -h    display help and exit\n"
+		"\n"
+		"Each non-option argument provides logo text for a meter.\n"
 	);
 }
 
@@ -408,6 +410,14 @@ int main(int argc, char **argv) {
 			fprintf(stderr, "%s %s\n", TITLE, VERSION);
 			exit(EXIT_SUCCESS);
 		}
+	}
+	int i, cn = 0;
+	for (i = optind; i < argc; ++i) {
+		if (cn == channels) break;
+		if (*argv[i]) {
+			LOGO[cn] = argv[i];
+		}
+		++cn;
 	}
 	setup(METER_WIDTH*channels);
 	SDL_Event event;
