@@ -383,15 +383,24 @@ static void setup(int width) {
 static void usage() {
 	printf(
 		"options:\n"
-		"  -v  display version and exit\n"
-		"  -h  display help and exit\n"
+		"  -c #  display # meters (default: 2)\n"
+		"  -v    display version and exit\n"
+		"  -h    display help and exit\n"
 	);
 }
 
 int main(int argc, char **argv) {
 	int opt;
-	while ((opt = getopt(argc, argv, "hv")) != -1) {
+	while ((opt = getopt(argc, argv, "c:hv")) != -1) {
 		switch (opt) {
+		case 'c':
+			channels = atoi(optarg);
+			if (channels < 1 || channels > CHANNELS) {
+				fprintf(stderr, "Specify 1 to %d channels\n",
+								CHANNELS);
+				exit(EXIT_FAILURE);
+			}
+			break;
 		case 'h':
 			usage();
 			exit(EXIT_SUCCESS);
