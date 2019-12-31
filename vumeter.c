@@ -18,6 +18,8 @@ static const char *VERSION = "2.0";
 
 #define CHANNELS 2
 
+static char *LOGO[CHANNELS] = { [0 ... CHANNELS-1] = "Nice VU" };
+
 static const int METER_WIDTH = 400;
 static const int WIDTH = METER_WIDTH * CHANNELS, HEIGHT = METER_WIDTH / 2;
 
@@ -263,11 +265,11 @@ static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	TTF_CloseFont(font);
 }
 
-static void draw_logo(SDL_Renderer *renderer, int x, int width) {
+static void draw_logo(SDL_Renderer *renderer, int x, int width, char *logo) {
 	TTF_Font *font = TTF_OpenFont(LOGO_FONT, 21);
 	sdl_check(font != NULL, "open logo font");
 	SDL_Color black = {70, 70, 70};
-	SDL_Surface *surface = TTF_RenderUTF8_Solid(font, "Nice VU", black);
+	SDL_Surface *surface = TTF_RenderUTF8_Solid(font, logo, black);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 	x = x + width / 2;
 	int y = width *3 / 8;
@@ -310,7 +312,8 @@ static void draw_indicators(SDL_Renderer *renderer, int x, int width,
 }
 
 static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour,
-			Uint32 peak_colour, int x, int width, int height) {
+			Uint32 peak_colour, int x, int width, int height,
+			char *logo) {
 	set_colour(renderer, 0x806633);
 	draw_rect(renderer, x+width*7/64, width/3, width/32, width/32);
 	draw_rect(renderer, x+width*55/64, width/3, width/32, width/32);
@@ -318,7 +321,7 @@ static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour,
 	draw_rect(renderer, x+width*5/16, width*3/8, width*6/16, width/16);
 	draw_ruler(renderer, x, width, scale_colour, peak_colour);
 	draw_labels(renderer, x, width);
-	draw_logo(renderer, x, width);
+	draw_logo(renderer, x, width, logo);
 }
 
 static struct SDL_Renderer *renderer;
@@ -353,7 +356,7 @@ static void setup() {
 		int cn;
 		for (cn = 0; cn < CHANNELS; ++cn) {
 			draw_meter(renderer, 0, 0xAA0000, cn*METER_WIDTH,
-							METER_WIDTH, HEIGHT);
+						METER_WIDTH, HEIGHT, LOGO[cn]);
 		}
 		SDL_RenderPresent(renderer);
 		/* Initialize audio. */
