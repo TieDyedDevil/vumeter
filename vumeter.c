@@ -23,8 +23,8 @@ static const int WIDTH = METER_WIDTH * CHANNELS, HEIGHT = METER_WIDTH / 2;
 
 static const float SIX_DBA = powf(10, 0.3);
 
-static const float PEAK_DB = powf(10, -1.5/20);
-static const float SIGNAL_DB = powf(10, -56.0/20);
+static const float PEAK_DBA = powf(10, -1.5/20);
+static const float SIGNAL_DBA = powf(10, -56.0/20);
 static const int PEAK_HOLD = 250; /* ms */
 
 /* Calibrated meter labels, measured using
@@ -105,8 +105,8 @@ static float get_max_amplitude(Sint16 *audio_buf, int len, int channel) {
 		}
 	}
 	float lin = max_amp / 32768.0;
-	if (lin > PEAK_DB) peak[channel] = PEAK_HOLD + SDL_GetTicks();
-	signal[channel] = lin > SIGNAL_DB;
+	if (lin > PEAK_DBA) peak[channel] = PEAK_HOLD + SDL_GetTicks();
+	signal[channel] = lin > SIGNAL_DBA;
 	return lin;
 }
 
