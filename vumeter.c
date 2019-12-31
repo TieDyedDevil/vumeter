@@ -350,8 +350,11 @@ static void setup() {
 		/* Draw background. */
 		SDL_SetRenderTarget(renderer, background);
 		draw_gradient(renderer, 0x806633, 0xFFCC66, WIDTH, HEIGHT);
-		draw_meter(renderer, 0, 0xAA0000, 0, WIDTH/2, HEIGHT);
-		draw_meter(renderer, 0, 0xAA0000, WIDTH/2, WIDTH/2, HEIGHT);
+		int cn;
+		for (cn = 0; cn < CHANNELS; ++cn) {
+			draw_meter(renderer, 0, 0xAA0000, cn*METER_WIDTH,
+							METER_WIDTH, HEIGHT);
+		}
 		SDL_RenderPresent(renderer);
 		/* Initialize audio. */
 		audiospec.freq = 48000;
