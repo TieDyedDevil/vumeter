@@ -1,4 +1,4 @@
-# vumeter 2.0
+# VUmeter 2.0
 
 This is a true VU meter for PulseAudio. (Most so-called VU meters are in
 fact peak program meters with a damped decay.)
