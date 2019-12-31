@@ -1,3 +1,4 @@
 - find font path
-- add option to instantiate N channels of metering (default 2)
+- add command-line option to instantiate N channels of metering (default 2)
+- read optional per-meter titles from command-line
 - build with clang
