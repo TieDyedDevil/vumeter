@@ -302,9 +302,10 @@ static void draw_indicators(SDL_Renderer *renderer, int x, int width,
 
 static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour,
 			Uint32 peak_colour, int x, int width, int height) {
-	set_colour(renderer, scale_colour);
+	set_colour(renderer, 0x806633);
 	draw_rect(renderer, x+width*7/64, width/3, width/32, width/32);
 	draw_rect(renderer, x+width*55/64, width/3, width/32, width/32);
+	set_colour(renderer, scale_colour);
 	draw_rect(renderer, x+width*5/16, width*3/8, width*6/16, width/16);
 	draw_ruler(renderer, x, width, scale_colour, peak_colour);
 	draw_labels(renderer, x, width);
