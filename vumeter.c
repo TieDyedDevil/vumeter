@@ -16,15 +16,16 @@ static const char *TITLE = "VUmeter";
 
 static const char *VERSION = "2.0";
 
-static const int WIDTH = 800, HEIGHT = WIDTH / 4;
+#define CHANNELS 2
+
+static const int METER_WIDTH = 400;
+static const int WIDTH = METER_WIDTH * CHANNELS, HEIGHT = METER_WIDTH / 2;
 
 static const float SIX_DBA = powf(10, 0.3);
 
 static const float PEAK_DB = powf(10, -1.5/20);
 static const float SIGNAL_DB = powf(10, -56.0/20);
 static const int PEAK_HOLD = 250; /* ms */
-
-#define CHANNELS 2
 
 /* Calibrated meter labels, measured using
 	$ play </dev/zero -q -t s32 -r 48000 -c 2 - synth sine 1000 \
@@ -113,8 +114,10 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 	SDL_Event event;
 	int now = SDL_GetTicks();
 	/* Update model, assuming callback is regularly called. */
-	model(&mass[0], force[0], 0, 1, now-time);
-	model(&mass[1], force[1], 0, 1, now-time);
+	int cn;
+	for (cn = 0; cn < CHANNELS; ++cn) {
+		model(&mass[cn], force[cn], 0, 1, now-time);
+	}
 	time = now;
 	/* Push redraw event. */
 	event.type = SDL_WINDOWEVENT;
@@ -126,8 +129,12 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 
 static void audio_callback(void *userdata, Uint8 *stream, int len) {
 	/* Calculate force on meter springs. */
-	force[0] = get_force(get_max_amplitude((Sint16*)stream, len/2, 0));
-	force[1] = get_force(get_max_amplitude((Sint16*)stream, len/2, 1));
+	int cn;
+	for (cn = 0; cn < CHANNELS; ++cn) {
+		force[cn] =
+			get_force(get_max_amplitude((Sint16*)stream,
+				len/(sizeof(Sint16)/sizeof(Uint8)), cn));
+	}
 }
 
 static void draw_gradient(SDL_Renderer *renderer, Uint32 colour1,
@@ -396,13 +403,14 @@ int main(int argc, char **argv) {
 			/* Redraw. */
 			SDL_SetRenderTarget(renderer, target);
 			SDL_RenderCopy(renderer, background, NULL, NULL);
-			draw_needle(renderer, 0, WIDTH/2, 0, mass[0].x);
-			draw_needle(renderer, WIDTH/2, WIDTH/2, 0,
-								mass[1].x);
-			draw_indicators(renderer, 0, WIDTH/2,
-							signal[0], &peak[0]);
-			draw_indicators(renderer, WIDTH/2, WIDTH/2,
-							signal[1], &peak[1]);
+			int cn, pos = 0;
+			for (cn = 0; cn < CHANNELS; ++cn) {
+				draw_needle(renderer, pos, METER_WIDTH, 0,
+								mass[cn].x);
+				draw_indicators(renderer, pos, METER_WIDTH,
+							signal[cn], &peak[cn]);
+				pos += METER_WIDTH;
+			}
 			SDL_SetRenderTarget(renderer, NULL);
 			SDL_RenderCopy(renderer, target, NULL, NULL);
 			SDL_RenderPresent(renderer);
