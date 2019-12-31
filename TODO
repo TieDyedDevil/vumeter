@@ -1,4 +1,3 @@
-- add signal and peak indicators (-56/-0.5 dB, 250 ms)
 - find font path
 - add option to instantiate N channels of metering (default 2)
 - build with clang

@@ -14,6 +14,9 @@ It is important that you understand that this meter is not suited to setting
 levels for a digital recording; use a peak program meter. This meter is best
 suited for evaluating perceptual program levels during playback.
 
+In addition to the meter, two indicators report SIGNAL and PEAK at levels
+greater than -56 dB and -1.5 dB, respectively.
+
 This code descends from original work by Martin Cameron. I've added text for
 labels on the scale and a logo, and have reworked the initialization code to
 (IMO) improve readability.

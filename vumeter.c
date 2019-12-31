@@ -20,6 +20,10 @@ static const int WIDTH = 800, HEIGHT = WIDTH / 4;
 
 static const float SIX_DBA = powf(10, 0.3);
 
+static const float PEAK_DB = powf(10, -1.5/20);
+static const float SIGNAL_DB = powf(10, -56.0/20);
+static const int PEAK_HOLD = 250; /* ms */
+
 /* Calibrated meter labels, measured using
 	$ play </dev/zero -q -t s32 -r 48000 -c 2 - synth sine 1000 \
 	  vol <number> dB
@@ -83,6 +87,9 @@ static float get_force(float amplitude) {
 	return force / 8;
 }
 
+static Uint32 peak[2] = {0};
+static int signal[2] = {0};
+
 static float get_max_amplitude(Sint16 *audio_buf, int len, int channel) {
 	int idx, amp, max_amp = 0;
 	for (idx = 0; idx < len; idx += 2) {
@@ -94,7 +101,10 @@ static float get_max_amplitude(Sint16 *audio_buf, int len, int channel) {
 			max_amp = amp;
 		}
 	}
-	return max_amp / 32768.0;
+	float lin = max_amp / 32768.0;
+	if (lin > PEAK_DB) peak[channel] = PEAK_HOLD + SDL_GetTicks();
+	signal[channel] = lin > SIGNAL_DB;
+	return lin;
 }
 
 static Uint32 timer_callback(Uint32 interval, void *param) {
@@ -204,26 +214,43 @@ static void sdl_check(int ok, const char *msg) {
 	}
 }
 
-static void draw_scale_label(SDL_Renderer *renderer, int x, int width) {
+static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	TTF_Font *font = TTF_OpenFont(SCALE_FONT, 17);
-	sdl_check(font != NULL, "open scale font");
-	SDL_Color white = {190, 190, 190};
-	x = x + width / 16;
+	sdl_check(font != NULL, "open labels font");
+	SDL_Color white = {200, 200, 200};
+	int rlx = x + width / 16;
 	int y = width / 5;
-	int i;
+	int i, w, h;
+	SDL_Surface *surface;
+	SDL_Texture *texture;
+	/* Ruler labels */
 	for (i = 0; i < 8; ++i) {
-		SDL_Surface *surface =
-			TTF_RenderUTF8_Solid(font, METER_SCALE[i], white);
-		SDL_Texture *texture =
-			SDL_CreateTextureFromSurface(renderer, surface);
-		int w, h;
+		surface = TTF_RenderUTF8_Solid(font, METER_SCALE[i], white);
+		texture = SDL_CreateTextureFromSurface(renderer, surface);
 		SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-		SDL_Rect dstrect = {x-w/2, y, w, h};
+		SDL_Rect dstrect = {rlx-w/2, y, w, h};
 		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
 		SDL_DestroyTexture(texture);
 		SDL_FreeSurface(surface);
-		x = x + width / 8;
+		rlx = rlx + width / 8;
 	}
+	SDL_Color white2 = {240, 240, 240};
+	/* Signal indicator label */
+	surface = TTF_RenderUTF8_Solid(font, "SIGNAL", white2);
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+	SDL_Rect dstrect_s = {x+width/8-w/2, width*6/16, w, h};
+	SDL_RenderCopy(renderer, texture, NULL, &dstrect_s);
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
+	/* Peak indicator label */
+	surface = TTF_RenderUTF8_Solid(font, "PEAK", white2);
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+	SDL_Rect dstrect_p = {x+width*7/8-w/2, width*6/16, w, h};
+	SDL_RenderCopy(renderer, texture, NULL, &dstrect_p);
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
 	TTF_CloseFont(font);
 }
 
@@ -255,12 +282,32 @@ static void draw_needle(SDL_Renderer *renderer, int x, int width,
 	SDL_RenderDrawLine(renderer, x+x1, y1, x+x2, y2);
 }
 
+static void draw_indicators(SDL_Renderer *renderer, int x, int width,
+						int signal, Uint32 *peak) {
+	if (signal) {
+		SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255);
+		fill_rect(renderer, x+width*7/64+1, width/3+1,
+						width/32-2, width/32-2);
+	}
+	if (*peak) {
+		if (*peak > SDL_GetTicks()) {
+			SDL_SetRenderDrawColor(renderer, 255, 255, 50, 255);
+		} else {
+			*peak = 0;
+		}
+		fill_rect(renderer, x+width*55/64+1, width/3+1,
+						width/32-2, width/32-2);
+	}
+}
+
 static void draw_meter(SDL_Renderer *renderer, Uint32 scale_colour,
 			Uint32 peak_colour, int x, int width, int height) {
 	set_colour(renderer, scale_colour);
+	draw_rect(renderer, x+width*7/64, width/3, width/32, width/32);
+	draw_rect(renderer, x+width*55/64, width/3, width/32, width/32);
 	draw_rect(renderer, x+width*5/16, width*3/8, width*6/16, width/16);
 	draw_ruler(renderer, x, width, scale_colour, peak_colour);
-	draw_scale_label(renderer, x, width);
+	draw_labels(renderer, x, width);
 	draw_logo(renderer, x, width);
 }
 
@@ -349,6 +396,10 @@ int main(int argc, char **argv) {
 			draw_needle(renderer, 0, WIDTH/2, 0, left_mass.x);
 			draw_needle(renderer, WIDTH/2, WIDTH/2, 0,
 								right_mass.x);
+			draw_indicators(renderer, 0, WIDTH/2,
+							signal[0], &peak[0]);
+			draw_indicators(renderer, WIDTH/2, WIDTH/2,
+							signal[1], &peak[1]);
 			SDL_SetRenderTarget(renderer, NULL);
 			SDL_RenderCopy(renderer, target, NULL, NULL);
 			SDL_RenderPresent(renderer);
