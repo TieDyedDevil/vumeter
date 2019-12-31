@@ -17,6 +17,12 @@ suited for evaluating perceptual program levels during playback.
 In addition to the meter, two indicators report SIGNAL and PEAK at levels
 greater than -56 dB and -1.5 dB, respectively.
 
+The PEAK indicator is provided to detect peaks in the program material which
+naturally occur as a result of normalizing the audio to a value approaching
+0 dB; when the average volume is below 0 dB, peaks will still occur in excess
+of that average value. You should not use this indicator to set recording
+levels.
+
 This code descends from original work by Martin Cameron. I've added text for
 labels on the scale and a logo, and have reworked the initialization code to
 (IMO) improve readability.
