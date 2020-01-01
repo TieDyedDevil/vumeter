@@ -29,3 +29,5 @@ via a command-line option; the logo text of each meter may be set individually.
 This code descends from original work by Martin Cameron.
 
 The program requires the SDL2 and SDL2\_ttf libraries and the DejaVu fonts.
+
+Build using gcc 9 or clang 9; clang is preferred.
