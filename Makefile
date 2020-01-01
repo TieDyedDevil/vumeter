@@ -13,7 +13,7 @@ vumeter: vumeter.c Makefile
 		`pkg-config SDL2_ttf --cflags --libs`
 
 install: vumeter
-	install vumeter /usr/local/bin/
+	install -s vumeter /usr/local/bin/
 	install -d /usr/local/share/doc/vumeter/
 	install -m 644 README.md TODO LICENSE /usr/local/share/doc/vumeter/
 
