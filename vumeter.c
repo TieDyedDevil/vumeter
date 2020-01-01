@@ -335,6 +335,7 @@ static void setup(int width) {
 	SDL_TimerID timer;
 	/* Initialize SDL. */
 	if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER) == 0) {
+		SDL_SetHint("SDL_HINT_VIDEO_ALLOW_SCREENSAVER", "1");
 		TTF_Init();
 		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED,
 				SDL_WINDOWPOS_UNDEFINED, width, HEIGHT, 0);
