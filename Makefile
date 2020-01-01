@@ -1,5 +1,5 @@
 
-CC = gcc
+CC ?= gcc
 CFLAGS = -Wall -g -std=c11 -U__STRICT_ANSI__
 
 all: vumeter
@@ -7,7 +7,7 @@ all: vumeter
 clean:
 	rm -f vumeter
 
-vumeter: vumeter.c
+vumeter: vumeter.c Makefile
 	$(CC) $(CFLAGS) vumeter.c -o vumeter -lm \
 		`sdl2-config --cflags --libs` \
 		`pkg-config SDL2_ttf --cflags --libs`

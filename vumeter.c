@@ -24,10 +24,10 @@ static char *LOGO[CHANNELS] = { [0 ... CHANNELS-1] = "Nice VU" };
 static const int METER_WIDTH = 400;
 static const int HEIGHT = METER_WIDTH / 2;
 
-static const float SIX_DBA = powf(10, 0.3);
+static const float SIX_DBA = 1.9952623149688795; /* 10^0.3 */
 
-static const float PEAK_DBA = powf(10, -1.5/20);
-static const float SIGNAL_DBA = powf(10, -56.0/20);
+static const float PEAK_DBA = 0.8413951416451951; /* 10^(-1.5/20) */
+static const float SIGNAL_DBA = 0.001584893192461114; /* 10^(-56.0/20) */
 static const int PEAK_HOLD = 250; /* ms */
 
 /* Calibrated meter labels, measured using
