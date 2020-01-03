@@ -123,7 +123,7 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 	}
 	time = now;
 	/* Push redraw event. */
-	event.type = SDL_WINDOWEVENT;
+	event.type = SDL_USEREVENT;
 	event.user.code = 0;
 	event.user.data1 = event.user.data2 = NULL;
 	SDL_PushEvent(&event);
@@ -426,7 +426,7 @@ int main(int argc, char **argv) {
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT) {
 			break;
-		} else if (event.type == SDL_WINDOWEVENT) {
+		} else if (event.type == SDL_USEREVENT) {
 			/* Redraw. */
 			SDL_SetRenderTarget(renderer, target);
 			SDL_RenderCopy(renderer, background, NULL, NULL);

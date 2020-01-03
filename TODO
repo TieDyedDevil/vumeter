@@ -1,5 +1,2 @@
 - clean/factor code
-- check additional events?
-  - suspected problem: PA config change may alter active connection, causing
-    an unchecked fault which hangs or invalidates (random signal?) metering
 - find path for named font?
