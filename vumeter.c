@@ -26,7 +26,9 @@ static const int HEIGHT = METER_WIDTH / 2;
 
 static const float SIX_DBA = 1.9952623149688795; /* 10^0.3 */
 
+#define PEAK_LEVEL "-1.5 dBFS"
 static const float PEAK_DBA = 0.8413951416451951; /* 10^(-1.5/20) */
+#define SIGNAL_LEVEL "-56 dBFS"
 static const float SIGNAL_DBA = 0.001584893192461114; /* 10^(-56.0/20) */
 static const int PEAK_HOLD = 250; /* ms */
 
@@ -382,13 +384,21 @@ static void setup(int width) {
 }
 
 static void usage() {
-	printf(
+	puts(
 		"Options:\n"
 		"  -c #  display # meters (default: 2)\n"
 		"  -v    display version and exit\n"
 		"  -h    display help and exit\n"
 		"\n"
 		"Each non-option argument provides logo text for a meter.\n"
+		"\n"
+		"Reference levels:\n"
+		"  0 VU = 0 dBFS\n"
+		"  SIGNAL = " SIGNAL_LEVEL "\n"
+		"  PEAK = " PEAK_LEVEL "\n"
+		"\n"
+		"Ballistics (nominal):\n"
+		"  300 ms to 99% of FS deflection; 1% overshoot.\n"
 	);
 }
 
