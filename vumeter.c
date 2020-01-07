@@ -32,6 +32,10 @@ static const float PEAK_DBA = 0.8413951416451951; /* 10^(-1.5/20) */
 static const float SIGNAL_DBA = 0.001584893192461114; /* 10^(-56.0/20) */
 static const int PEAK_HOLD = 250; /* ms */
 
+#ifndef M_PI
+#define M_PI 3.141592653589793
+#endif
+
 /* Calibrated meter labels, measured using
 	$ play </dev/zero -q -t s32 -r 48000 -c 2 - synth sine 1000 \
 	  vol <number> dB
