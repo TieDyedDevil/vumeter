@@ -440,6 +440,9 @@ int main(int argc, char **argv) {
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT) {
 			break;
+		} else if (event.type == SDL_AUDIODEVICEREMOVED) {
+			fprintf(stderr, "audio device removed\n");
+			break;
 		} else if (event.type == SDL_USEREVENT) {
 			/* Redraw. */
 			SDL_SetRenderTarget(renderer, target);
