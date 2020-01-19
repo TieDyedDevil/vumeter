@@ -60,7 +60,10 @@ static int time;
 static float force[CHANNELS];
 
 static struct sprung_mass mass[CHANNELS] = {
-	/* The natural frequency of this system should be 2.1 Hz +/- 10%. */
+	/* The natural frequency is 2.1 Hz +/- 10%, as required by spec.
+	   Damping lowers the resonant frequency, due to the second factor:
+		w = sqrt(k/m)*sqrt(1-(d/(2*sqrt(m/k)))^2)
+	   Note that w is angular frequency; f = w/(2*pi). */
 	[0 ... CHANNELS-1] = {0.005, 1.0, 0.08, 1}
 };
 
