@@ -215,6 +215,9 @@ static void draw_ruler(SDL_Renderer *renderer, int x, int width,
 	int h = width / 16;
 	int segment_width = w / 7;
 	x = x + width / 16;
+	/* Yellow segment. */
+	set_colour(renderer, 0xb09f44);
+	fill_rect(renderer, x+segment_width*5, y, segment_width, h/3*2);
 	/* End red segment. */
 	set_colour(renderer, peak_colour);
 	fill_rect(renderer, x+segment_width*6, y, segment_width, h/3*2);
