@@ -301,7 +301,7 @@ static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
 	/* Peak indicator label */
-	surface = TTF_RenderUTF8_Solid(font3, "⚠", white2);
+	surface = TTF_RenderUTF8_Solid(font3, "⚡", white2);
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 	SDL_Rect dstrect_p = {x+width*7/8-w/2, width*6/16, w, h};
