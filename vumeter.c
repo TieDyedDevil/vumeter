@@ -44,9 +44,10 @@ static const int PEAK_HOLD = 250; /* ms */
 	$ play -n -q -t s32 -r 48000 -c 2 - synth -n sine 1000 vol <number> dB
 
    Be certain that PulseAudio gains are set to unity on source and sink.
+   Do NOT attempt to check calibration of a meter attached to a loop source.
 */
 static const char *METER_SCALE[8] =
-			{"-41", "-35", "-29", "-23", "-17", "-11", "-5", "+1"};
+			{"-42", "-36", "-30", "-24", "-18", "-12", "-6", "0"};
 
 static const char *SCALE_FONT = "/usr/share/fonts/dejavu/DejaVuSans.ttf";
 static const char *LOGO_FONT =
