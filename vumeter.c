@@ -26,10 +26,10 @@ static const int HEIGHT = METER_WIDTH / 2;
 
 static const float SIX_DBA = 1.9952623149688795; /* 10^(6/20) */
 
-#define PEAK_LEVEL "-1.5 dBFS"
+#define PEAK_LEVEL "-1.5"
 static const float PEAK_DBA = 0.8413951416451951; /* 10^(-1.5/20) */
-#define SIGNAL_LEVEL "-56 dBFS"
-static const float SIGNAL_DBA = 0.001584893192461114; /* 10^(-56.0/20) */
+#define SIGNAL_LEVEL "-54"
+static const float SIGNAL_DBA = 0.001995262314968879; /* 10^(-54/20) */
 static const int PEAK_HOLD = 250; /* ms */
 
 #ifndef M_PI
@@ -51,11 +51,14 @@ static const char *METER_SCALE[8] =
 static const char *DYNAMICS_SCALE[8] =
 			{"𝆏𝆏𝆏", "𝆏𝆏", "𝆏", "𝆐𝆏", "𝆐𝆑", "𝆑", "𝆑𝆑", "𝆑𝆑𝆑"};
 
-static const char *SCALE_FONT = "/usr/share/fonts/dejavu/DejaVuSans.ttf";
+static const char *SCALE_FONT =
+		"/usr/share/fonts/google-noto/NotoSans-Regular.ttf";
 static const char *DYNAMICS_FONT =
-			"/usr/share/fonts/google-noto/NotoMusic-Regular.ttf";
+		"/usr/share/fonts/google-noto/NotoMusic-Regular.ttf";
+static const char *SYMBOLS_FONT =
+		"/usr/share/fonts/google-noto/NotoSansSymbols2-Regular.ttf";
 static const char *LOGO_FONT =
-			"/usr/share/fonts/dejavu/DejaVuSans-BoldOblique.ttf";
+		"/usr/share/fonts/google-noto/NotoSans-SemiBoldItalic.ttf";
 
 struct sprung_mass {
 	float m; /* mass */
@@ -250,7 +253,11 @@ static void sdl_check(int ok, const char *msg) {
 
 static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	TTF_Font *font = TTF_OpenFont(SCALE_FONT, 17);
+	TTF_SetFontHinting(font, TTF_HINTING_NORMAL);
 	TTF_Font *font2 = TTF_OpenFont(DYNAMICS_FONT, 17);
+	TTF_SetFontHinting(font2, TTF_HINTING_NORMAL);
+	TTF_Font *font3 = TTF_OpenFont(SYMBOLS_FONT, 17);
+	TTF_SetFontHinting(font3, TTF_HINTING_NORMAL);
 	sdl_check(font != NULL, "open labels font");
 	SDL_Color white = {200, 200, 200};
 	int rlx = x + width / 16;
@@ -286,7 +293,7 @@ static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	}
 	SDL_Color white2 = {240, 240, 240};
 	/* Signal indicator label */
-	surface = TTF_RenderUTF8_Solid(font, "SIGNAL", white2);
+	surface = TTF_RenderUTF8_Solid(font3, "🔉", white2);
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 	SDL_Rect dstrect_s = {x+width/8-w/2, width*6/16, w, h};
@@ -294,7 +301,7 @@ static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
 	/* Peak indicator label */
-	surface = TTF_RenderUTF8_Solid(font, "PEAK", white2);
+	surface = TTF_RenderUTF8_Solid(font3, "⚠", white2);
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 	SDL_Rect dstrect_p = {x+width*7/8-w/2, width*6/16, w, h};
@@ -303,6 +310,7 @@ static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	SDL_FreeSurface(surface);
 	TTF_CloseFont(font);
 	TTF_CloseFont(font2);
+	TTF_CloseFont(font3);
 }
 
 static void draw_logo(SDL_Renderer *renderer, int x, int width, char *logo) {
@@ -312,7 +320,7 @@ static void draw_logo(SDL_Renderer *renderer, int x, int width, char *logo) {
 	SDL_Surface *surface = TTF_RenderUTF8_Solid(font, logo, black);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 	x = x + width / 2;
-	int y = width *3 / 8;
+	int y = width * 47 / 128;
 	int w, h;
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 	SDL_Rect dstrect = {x-w/2, y, w, h};
@@ -431,8 +439,8 @@ static void usage() {
 		"\n"
 		"Reference levels:\n"
 		"  0 VU = 0 dBFS\n"
-		"  SIGNAL = " SIGNAL_LEVEL "\n"
-		"  PEAK = " PEAK_LEVEL "\n"
+		"  SIGNAL > " SIGNAL_LEVEL " dBFS\n"
+		"  PEAK > " PEAK_LEVEL " dBFS\n"
 		"\n"
 		"Ballistics (nominal):\n"
 		"  300 ms to 99% of FS deflection; 1% overshoot.\n"

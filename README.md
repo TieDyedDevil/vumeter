@@ -14,10 +14,10 @@ It is important that you understand that this meter is not suited to setting
 levels for a digital recording; use a peak program meter. This meter is best
 suited for evaluating perceptual program levels during playback.
 
-In addition to the meter, two indicators report SIGNAL and PEAK at levels
+In addition to the meter, two indicators report signal and peak at levels
 greater than -56 dB and -1.5 dB, respectively.
 
-The PEAK indicator is provided to detect peaks in the program material which
+The peak indicator is provided to detect peaks in the program material which
 naturally occur as a result of normalizing the audio to a value approaching
 0 dB; when the average volume is below 0 dB, peaks will still occur in excess
 of that average value. You should not use this indicator to set recording
@@ -31,7 +31,7 @@ via a command-line option; the logo text of each meter may be set individually.
 
 This code descends from original work by Martin Cameron.
 
-The program requires the SDL2 and SDL2\_ttf libraries and the DejaVu and
-Google Noto fonts.
+The program requires the SDL2 and SDL2\_ttf libraries and the Google Noto
+fonts.
 
 Build using gcc 9 or clang 9; clang is preferred.
