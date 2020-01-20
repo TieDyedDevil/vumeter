@@ -36,13 +36,17 @@ static const int PEAK_HOLD = 250; /* ms */
 #define M_PI 3.141592653589793
 #endif
 
+#ifndef M_1_PI
+#define M_1_PI (1/M_PI)
+#endif
+
 /* Calibrated meter labels, measured using
 	$ play -n -q -t s32 -r 48000 -c 2 - synth -n sine 1000 vol <number> dB
 
    Be certain that PulseAudio gains are set to unity on source and sink.
 */
 static const char *METER_SCALE[8] =
-			{"-∞", "-43", "-36", "-28", "-20", "-12", "-5", "0"};
+			{"-∞", "-35", "-29", "-23", "-17", "-11", "-5", "0"};
 
 static const char *SCALE_FONT = "/usr/share/fonts/dejavu/DejaVuSans.ttf";
 static const char *LOGO_FONT =
@@ -96,11 +100,11 @@ static float model(struct sprung_mass *sm, float force, float x_min,
 }
 
 static float get_force(float amplitude) {
-	float force = logf(amplitude) / logf(SIX_DBA) + 8;
+	float force = ( logf(amplitude) / logf(SIX_DBA) + 7 ) / 7;
 	if (force < 0) {
 		force = 0;
 	}
-	return force / 8;
+	return ( atanf( force * 2 - 1 ) * M_1_PI * 4 + 1 ) / 2;
 }
 
 static Uint32 peak[CHANNELS] = {0};
