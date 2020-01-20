@@ -15,7 +15,7 @@ levels for a digital recording; use a peak program meter. This meter is best
 suited for evaluating perceptual program levels during playback.
 
 In addition to the meter, two indicators report signal and peak at levels
-greater than -56 dB and -1.5 dB, respectively.
+greater than -54 dB and -1.5 dB, respectively.
 
 The peak indicator is provided to detect peaks in the program material which
 naturally occur as a result of normalizing the audio to a value approaching
