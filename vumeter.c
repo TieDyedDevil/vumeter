@@ -212,7 +212,7 @@ static void draw_ruler(SDL_Renderer *renderer, int x, int width,
 	x = x + width / 16;
 	/* End red segment. */
 	set_colour(renderer, peak_colour);
-	fill_rect(renderer, x+segment_width*6, y, segment_width, h);
+	fill_rect(renderer, x+segment_width*6, y, segment_width, h/3*2);
 	/* Ruler segments. */
 	set_colour(renderer, scale_colour);
 	for (n = x; n < x+segment_width*7; n += segment_width){
