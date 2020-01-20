@@ -48,8 +48,12 @@ static const int PEAK_HOLD = 250; /* ms */
 */
 static const char *METER_SCALE[8] =
 			{"-42", "-36", "-30", "-24", "-18", "-12", "-6", "0"};
+static const char *DYNAMICS_SCALE[8] =
+			{"𝆏𝆏𝆏", "𝆏𝆏", "𝆏", "𝆐𝆏", "𝆐𝆑", "𝆑", "𝆑𝆑", "𝆑𝆑𝆑"};
 
 static const char *SCALE_FONT = "/usr/share/fonts/dejavu/DejaVuSans.ttf";
+static const char *DYNAMICS_FONT =
+			"/usr/share/fonts/google-noto/NotoMusic-Regular.ttf";
 static const char *LOGO_FONT =
 			"/usr/share/fonts/dejavu/DejaVuSans-BoldOblique.ttf";
 
@@ -243,6 +247,7 @@ static void sdl_check(int ok, const char *msg) {
 
 static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	TTF_Font *font = TTF_OpenFont(SCALE_FONT, 17);
+	TTF_Font *font2 = TTF_OpenFont(DYNAMICS_FONT, 17);
 	sdl_check(font != NULL, "open labels font");
 	SDL_Color white = {200, 200, 200};
 	int rlx = x + width / 16;
@@ -250,9 +255,24 @@ static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	int i, w, h;
 	SDL_Surface *surface;
 	SDL_Texture *texture;
-	/* Ruler labels */
+	/* Ruler labels: dB */
 	for (i = 0; i < 8; ++i) {
 		surface = TTF_RenderUTF8_Solid(font, METER_SCALE[i], white);
+		texture = SDL_CreateTextureFromSurface(renderer, surface);
+		SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+		SDL_Rect dstrect = {rlx-w/2, y, w, h};
+		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+		SDL_DestroyTexture(texture);
+		SDL_FreeSurface(surface);
+		rlx = rlx + width / 8;
+	}
+	/* Ruler labels: dynamics */
+	SDL_Color white3 = {170, 170, 170};
+	rlx = x + width / 16;
+	y = width / 19;
+	for (i = 0; i < 8; ++i) {
+		surface =
+			TTF_RenderUTF8_Solid(font2, DYNAMICS_SCALE[i], white3);
 		texture = SDL_CreateTextureFromSurface(renderer, surface);
 		SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 		SDL_Rect dstrect = {rlx-w/2, y, w, h};
@@ -279,6 +299,7 @@ static void draw_labels(SDL_Renderer *renderer, int x, int width) {
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
 	TTF_CloseFont(font);
+	TTF_CloseFont(font2);
 }
 
 static void draw_logo(SDL_Renderer *renderer, int x, int width, char *logo) {
