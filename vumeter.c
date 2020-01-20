@@ -46,7 +46,7 @@ static const int PEAK_HOLD = 250; /* ms */
    Be certain that PulseAudio gains are set to unity on source and sink.
 */
 static const char *METER_SCALE[8] =
-			{"-∞", "-35", "-29", "-23", "-17", "-11", "-5", "0"};
+			{"-41", "-35", "-29", "-23", "-17", "-11", "-5", "+1"};
 
 static const char *SCALE_FONT = "/usr/share/fonts/dejavu/DejaVuSans.ttf";
 static const char *LOGO_FONT =
