@@ -24,7 +24,7 @@ static char *LOGO[CHANNELS] = { [0 ... CHANNELS-1] = "Nice VU" };
 static const int METER_WIDTH = 400;
 static const int HEIGHT = METER_WIDTH / 2;
 
-static const float SIX_DBA = 1.9952623149688795; /* 10^0.3 */
+static const float SIX_DBA = 1.9952623149688795; /* 10^(6/20) */
 
 #define PEAK_LEVEL "-1.5 dBFS"
 static const float PEAK_DBA = 0.8413951416451951; /* 10^(-1.5/20) */
