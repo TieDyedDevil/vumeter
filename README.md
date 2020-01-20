@@ -23,8 +23,9 @@ naturally occur as a result of normalizing the audio to a value approaching
 of that average value. You should not use this indicator to set recording
 levels.
 
-Be aware that metering accuracy depends upon the signal path. In particular,
-note that PulseAudio loops are not unity-gain.
+A command-line option is provided to set makeup gain. Use this to compensate
+when monitoring a sink that has its volume set to less than 100%. Determine
+the appropriate gain by inspecting the output of `pactl list sinks`.
 
 By default, two meters are instantiated. More or fewer meters may be specified
 via a command-line option; the logo text of each meter may be set individually.

@@ -19,6 +19,8 @@ static const char *VERSION = "2.0";
 #define CHANNELS 8
 static int channels = 2;
 
+static float gain = 1.0;
+
 static char *LOGO[CHANNELS] = { [0 ... CHANNELS-1] = "Nice VU" };
 
 static const int METER_WIDTH = 400;
@@ -129,7 +131,7 @@ static float get_max_amplitude(Sint16 *audio_buf, int len, int channel) {
 			max_amp = amp;
 		}
 	}
-	float lin = max_amp / 32768.0;
+	float lin = max_amp * gain / 32768.0;
 	if (lin > PEAK_DBA) peak[channel] = PEAK_HOLD + SDL_GetTicks();
 	signal[channel] = lin > SIGNAL_DBA;
 	return lin;
@@ -432,6 +434,7 @@ static void usage() {
 	puts(
 		"Options:\n"
 		"  -c #  display # meters (default: 2)\n"
+		"  -m #  makeup gain (default: 0.0 dB)\n"
 		"  -v    display version and exit\n"
 		"  -h    display help and exit\n"
 		"\n"
@@ -449,7 +452,7 @@ static void usage() {
 
 int main(int argc, char **argv) {
 	int opt;
-	while ((opt = getopt(argc, argv, "c:hv")) != -1) {
+	while ((opt = getopt(argc, argv, "c:hm:v")) != -1) {
 		switch (opt) {
 		case 'c':
 			channels = atoi(optarg);
@@ -462,6 +465,9 @@ int main(int argc, char **argv) {
 		case 'h':
 			usage();
 			exit(EXIT_SUCCESS);
+		case 'm':
+			gain = powf(10, atof(optarg)/20);
+			break;
 		case 'v':
 			fprintf(stderr, "%s %s\n", TITLE, VERSION);
 			exit(EXIT_SUCCESS);
