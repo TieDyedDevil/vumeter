@@ -40,7 +40,7 @@ static const int PEAK_HOLD = 250; /* ms */
 #define M_1_PI (1/M_PI)
 #endif
 
-/* Calibrated meter labels, measured using
+/* Calibrated meter labels, confirmed using
 	$ play -n -q -t s32 -r 48000 -c 2 - synth -n sine 1000 vol <number> dB
 
    Be certain that PulseAudio gains are set to unity on source and sink.
@@ -210,11 +210,12 @@ static void draw_ruler(SDL_Renderer *renderer, int x, int width,
 	int h = width / 16;
 	int segment_width = w / 7;
 	x = x + width / 16;
-	/* First black segment. */
-	set_colour(renderer, scale_colour);
-	fill_rect(renderer, x, y, segment_width, h);
+	/* End red segment. */
+	set_colour(renderer, peak_colour);
+	fill_rect(renderer, x+segment_width*6, y, segment_width, h);
 	/* Ruler segments. */
-	for (n = x+segment_width; n < x+segment_width*6; n += segment_width){
+	set_colour(renderer, scale_colour);
+	for (n = x; n < x+segment_width*7; n += segment_width){
 		fill_rect(renderer, n, y, segment_width, 1);
 		/* Big marks. */
 		fill_rect(renderer, n, y, 1, h);
@@ -227,9 +228,8 @@ static void draw_ruler(SDL_Renderer *renderer, int x, int width,
 			}
 		}
 	}
-	/* End red segment. */
-	set_colour(renderer, peak_colour);
-	fill_rect(renderer, x+segment_width*6, y, segment_width, h);
+	/* Final big mark */
+	fill_rect(renderer, n, y, 1, h);
 }
 
 static void sdl_check(int ok, const char *msg) {
