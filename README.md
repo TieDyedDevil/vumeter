@@ -23,10 +23,6 @@ naturally occur as a result of normalizing the audio to a value approaching
 of that average value. You should not use this indicator to set recording
 levels.
 
-A command-line option is provided to set makeup gain. Use this to compensate
-when monitoring a sink that has its volume set to less than 100%. Determine
-the appropriate gain by inspecting the output of `pactl list sinks`.
-
 The meter may or may not be affected by volume changes on its monitored
 sink. For example, if your sink is called `audio-card`, you'd attach the
 meter to `audio-card.monitor`. If the sink has hardware volume control,
@@ -41,6 +37,13 @@ a null sink module and one or more loopback modules), be aware that this
 connection has a loss of 1 dB (for reasons that are unexplained by the
 documentation). You should compensate for this using the meter's makeup
 gain option.
+
+You may also use makeup gain to compensate when monitoring a sink that
+does not have the `HW_VOLUME_CTRL` and has its volume set to less than 100%.
+Determine the appropriate gain by inspecting the output of `pactl list sinks`.
+Remember that the makeup gain is independent of the sink volume; if the
+latter changes, you'll need to create a new meter with the appropriate
+makeup gain.
 
 By default, two meters are instantiated. More or fewer meters may be specified
 via a command-line option; the logo text of each meter may be set individually.
