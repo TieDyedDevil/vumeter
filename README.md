@@ -27,6 +27,21 @@ A command-line option is provided to set makeup gain. Use this to compensate
 when monitoring a sink that has its volume set to less than 100%. Determine
 the appropriate gain by inspecting the output of `pactl list sinks`.
 
+The meter may or may not be affected by volume changes on its monitored
+sink. For example, if your sink is called `audio-card`, you'd attach the
+meter to `audio-card.monitor`. If the sink has hardware volume control,
+as evidenced by the presence of the `HW_VOLUME_CTRL` flag in the listing
+obtained from `pactl list sinks`, then the monitor will receive the same
+signal level regardless of the sink volume, unless the volume is zero or
+muted. If the source does not report the `HW_VOLUME_CTRL` flag, then the
+monitor volume will track the sink's volume setting.
+
+In the event that you attach the meter to a virtual sink (created using
+a null sink module and one or more loopback modules), be aware that this
+connection has a loss of 1 dB (for reasons that are unexplained by the
+documentation). You should compensate for this using the meter's makeup
+gain option.
+
 By default, two meters are instantiated. More or fewer meters may be specified
 via a command-line option; the logo text of each meter may be set individually.
 
