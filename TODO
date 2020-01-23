@@ -1,2 +1,4 @@
+- fix hang which occurs when moving meter inputs to another source
+  - this could be an SDL2 issue
 - clean/factor code
 - find path for named font?
