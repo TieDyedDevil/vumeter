@@ -6,7 +6,7 @@ in fact peak program meters with a damped decay.)
 A VU meter's reading corresponds approximately to the perceptual
 response of the human ear. This implementation differs from an analog
 VU meter in that it has a wider effective dynamic range and an accurate,
-linearized (i.e. a constant 6 dB per major division) scale. The meter's
+linearized scale (i.e. a constant 6 dB per major division). The meter's
 ballistic property matches an analog VU meter in that it takes the
 needle approximately 300 milliseconds to go from no-signal to 0 dB upon
 application of a full-scale signal.
@@ -20,19 +20,20 @@ In addition to the meter, two indicators report signal and peak at levels
 greater than -54 dB and -1.5 dB, respectively.
 
 The peak indicator is provided to detect peaks in the program material
-which naturally occur as a result of normalizing the audio to a value
-approaching 0 dB; when the average volume is below 0 dB, peaks will
-still occur in excess of that average value. You should not use this
-indicator to set recording levels.
+which naturally occur as a result of normalizing an audio program to a
+value approaching 0 dB; when the average volume is below 0 dB, peaks
+will still occur in excess of that average value. You should not use
+the peak indicator to set recording levels.
 
 The meter may or may not be affected by volume changes on its monitored
-sink. For example, if your sink is called `audio-card`, you'd attach the
-meter to `audio-card.monitor`. If the sink has hardware volume control,
-as evidenced by the presence of the `HW_VOLUME_CTRL` flag in the listing
-obtained from `pactl list sinks`, then the monitor will receive the
-same signal level regardless of the sink volume, unless the volume is
-zero or muted. If the source does not report the `HW_VOLUME_CTRL` flag,
-then the monitor volume will track the sink's volume setting.
+sink. For example, to monitor a PulseAudio sink name `audio-card`,
+you'd attach the meter to the `audio-card.monitor` source. If the sink
+implements a hardware volume control, as evidenced by the presence of the
+`HW_VOLUME_CTRL` flag in the listing obtained from `pactl list sinks`,
+then the monitor will receive the same signal level regardless of the
+sink volume, unless the sink volume becomes zero or the sink is muted. If
+the source does not report the `HW_VOLUME_CTRL` flag, then the monitor
+volume will track the sink's volume setting.
 
 In the event that you attach the meter to a virtual sink (created using
 a null sink module and one or more loopback modules), be aware that this
@@ -45,11 +46,13 @@ that does not have the `HW_VOLUME_CTRL` and has its volume set to less
 than 100%.  Determine the appropriate gain by inspecting the output of
 `pactl list sinks`.  Remember that the makeup gain is independent of the
 sink volume; if the latter changes, you'll need to create a new meter
-with the appropriate makeup gain.
+having the appropriate complementary makeup gain.
 
 By default, two meters are instantiated. More or fewer meters may be
-specified via a command-line option; the logo text of each meter may be
-set individually.
+specified via a command-line option; the logo text of each meter may
+be set individually. PulseAudio will combine channels in the event that
+the meter has fewer channels than its source; for example, a one channel
+meter will report the level of all of the source channels mixed to mono.
 
 This code descends from original work by Martin Cameron.
 
