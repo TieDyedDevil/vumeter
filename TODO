@@ -1,4 +1,6 @@
-- fix hang which occurs when moving meter inputs to another source
-  - this could be an SDL2 issue
-- clean/factor code
-- find path for named font?
+- Fix hang which occurs when moving meter inputs to another source.
+  - This is likely an SDL2 issue.
+  - When "hung", both callbacks and the event loop are still working;
+    no new audio is received, and the app fails to exit except via SIGKILL.
+- Clean/factor code.
+- Find path for named font?
