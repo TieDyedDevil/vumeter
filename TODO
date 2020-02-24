@@ -2,5 +2,11 @@
   - This is likely an SDL2 issue.
   - When "hung", both callbacks and the event loop are still working;
     no new audio is received, and the app fails to exit except via SIGKILL.
+- Recently, I've seen vumeter crash the Xorg server.
+    - Again, I suspect SDL2 skullduggery.
+- Seeing as how this doesn't need a window toolkit, but only some simple drawing
+  and canvas primitives, perhaps VUmeter should run on top of X11 and PulseAudio
+  APIs: one thread reads the PA stream and writes the pointer offset to memory;
+  another periodically reads the pointer offset from memory and updates the display.
 - Clean/factor code.
 - Find path for named font?
